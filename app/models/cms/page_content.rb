@@ -18,9 +18,11 @@ class Cms::PageContent < ActiveRecord::Base
     :autosave   => true,
     :inverse_of => :content,
     :dependent  => :destroy
-  has_many :blocks,
-    :autosave   => true,
+  has_many :versioned_contents,
+    :as         => :versionable,
     :dependent  => :destroy
+  has_many :blocks,
+    :through    => :versioned_contents
 
   # -- Callbacks ------------------------------------------------------------
   before_save :set_cached_content

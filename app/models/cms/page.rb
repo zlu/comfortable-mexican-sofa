@@ -26,28 +26,29 @@ class Cms::Page < ActiveRecord::Base
     :dependent  => :destroy
   
   # -- Callbacks ------------------------------------------------------------
-  before_validation :assigns_label,
-                    :assign_parent,
-                    :escape_slug,
-                    :assign_full_path
+  before_validation :assign_parent#,
+                    # :assigns_label,
+                    
+                    # :escape_slug,
+                    # :assign_full_path
 
   before_create     :assign_position
   after_save        :sync_child_pages
-  after_find        :unescape_slug_and_path
+  # after_find        :unescape_slug_and_path
   
   # -- Validations ----------------------------------------------------------
   validates :site_id, 
     :presence   => true
-  validates :label,
-    :presence   => true
-  validates :slug,
-    :presence   => true,
-    :uniqueness => { :scope => :parent_id },
-    :unless     => lambda{ |p| p.site && (p.site.pages.count == 0 || p.site.pages.root == self) }
+  #validates :label,
+  #  :presence   => true
+  #validates :slug,
+  #  :presence   => true,
+  #  :uniqueness => { :scope => :parent_id },
+  #  :unless     => lambda{ |p| p.site && (p.site.pages.count == 0 || p.site.pages.root == self) }
   validates :layout,
     :presence   => true
   validate :validate_target_page
-  validate :validate_format_of_unescaped_slug
+  # validate :validate_format_of_unescaped_slug
   
   # -- Scopes ---------------------------------------------------------------
   default_scope -> { order('cms_pages.position') }
