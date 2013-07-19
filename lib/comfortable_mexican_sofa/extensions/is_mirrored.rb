@@ -10,7 +10,7 @@ module ComfortableMexicanSofa::IsMirrored
       
       attr_accessor :is_mirrored
       
-      after_save    :sync_mirror
+      # after_save    :sync_mirror
       after_destroy :destroy_mirror
     end
   end

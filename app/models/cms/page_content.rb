@@ -59,12 +59,11 @@ class Cms::PageContent < ActiveRecord::Base
   #     { :identifier => 'block_2', :content => 'block content' }
   #   ]
   def blocks_attributes=(block_hashes = [])
+    versioned_content = self.versioned_contents.build
     block_hashes = block_hashes.values if block_hashes.is_a?(Hash)
     block_hashes.each do |block_hash|
       block_hash.symbolize_keys! unless block_hash.is_a?(HashWithIndifferentAccess)
-      block = 
-        self.blocks.detect{|b| b.identifier == block_hash[:identifier]} || 
-        self.blocks.build(:identifier => block_hash[:identifier])
+      block = versioned_content.blocks.build(:identifier => block_hash[:identifier])
       block.content = block_hash[:content]
     end
   end

@@ -33,7 +33,7 @@ class Cms::Page < ActiveRecord::Base
                     # :assign_full_path
 
   before_create     :assign_position
-  after_save        :sync_child_pages
+  # after_save        :sync_child_pages
   # after_find        :unescape_slug_and_path
   
   # -- Validations ----------------------------------------------------------
