@@ -6,6 +6,9 @@ class Cms::Block < ActiveRecord::Base
   
   # -- Relationships --------------------------------------------------------
   belongs_to :page
+  has_many :mutations,
+    :as         => :mutated,
+    :dependent  => :destroy
   has_many :files,
     :autosave   => true,
     :dependent  => :destroy

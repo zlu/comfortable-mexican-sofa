@@ -1,0 +1,7 @@
+default:
+  mutated: default_field_text (Cms::Block)
+  identifier: en
+  
+other:
+  mutated: default_field_text (Cms::Block)
+  identifier: fr

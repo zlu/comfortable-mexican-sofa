@@ -1,6 +1,6 @@
 class CreateCms < ActiveRecord::Migration
   
-  def self.up
+  def change
     
     text_limit = case ActiveRecord::Base.connection.adapter_name
       when 'PostgreSQL'
@@ -97,7 +97,7 @@ class CreateCms < ActiveRecord::Migration
     add_index :cms_files, [:site_id, :block_id]
     
     # -- Revisions -----------------------------------------------------------
-    create_table :cms_revisions, :force => true do |t|
+    create_table :cms_revisions do |t|
       t.string    :record_type, :null => false
       t.integer   :record_id,   :null => false
       t.text      :data,        text_limit
@@ -107,32 +107,43 @@ class CreateCms < ActiveRecord::Migration
       :name => 'index_cms_revisions_on_rtype_and_rid_and_created_at'
     
     # -- Categories ---------------------------------------------------------
-    create_table :cms_categories, :force => true do |t|
+    create_table :cms_categories do |t|
       t.integer :site_id,          :null => false
       t.string  :label,            :null => false
       t.string  :categorized_type, :null => false
     end
     add_index :cms_categories, [:site_id, :categorized_type, :label], :unique => true
     
-    create_table :cms_categorizations, :force => true do |t|
+    create_table :cms_categorizations do |t|
       t.integer :category_id,       :null => false
       t.string  :categorized_type,  :null => false
       t.integer :categorized_id,    :null => false
     end
     add_index :cms_categorizations, [:category_id, :categorized_type, :categorized_id], :unique => true,
       :name => 'index_cms_categorizations_on_cat_id_and_catd_type_and_catd_id'
-  end
-  
-  def self.down
-    drop_table :cms_sites
-    drop_table :cms_layouts
-    drop_table :cms_pages
-    drop_table :cms_snippets
-    drop_table :cms_blocks
-    drop_table :cms_files
-    drop_table :cms_revisions
-    drop_table :cms_categories
-    drop_table :cms_categorizations
+      
+    # -- Mutations ----------------------------------------------------------
+    create_table :cms_mutations do |t|
+      t.string  :identifier,    :null => false
+      t.string  :mutated_type,  :null => false
+      t.integer :mutated_id,    :null => false
+    end
+    add_index :cms_mutations, [:mutated_type, :mutated_id]
+    add_index :cms_mutations, :identifier
+    
+    # -- Versions -----------------------------------------------------------
+    create_table :cms_versions do |t|
+      t.string    :versioned_type,  :null => false
+      t.integer   :versioned_id,    :null => false
+      t.boolean   :is_active,       :null => false, :default => false
+      t.datetime  :published_at
+      t.text      :cache,             text_limit
+    end
+    add_index :cms_versions, [:versioned_type, :versioned_id],
+     :name => 'index_cms_versions_on_versioned'
+    add_index :cms_versions, :is_active
+    add_index :cms_versions, :published_at
+    
   end
 end
 
