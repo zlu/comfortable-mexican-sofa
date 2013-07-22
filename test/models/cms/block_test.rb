@@ -196,4 +196,20 @@ class CmsBlockTest < ActiveSupport::TestCase
     end
   end
   
+  def test_mutation_identifiers_writer
+    block = cms_blocks(:default_field_text)
+    assert_equal 2, block.mutations.count
+    block.mutation_identifiers = {
+      'fr'  => 0,
+      'jp'  => 1
+    }
+    assert_equal 3, block.mutations.size
+    assert en = block.mutations.detect{|m| m.identifier == 'en'}
+    assert !en.new_record?
+    assert fr = block.mutations.detect{|m| m.identifier == 'fr'}
+    assert fr.marked_for_destruction?
+    assert jp = block.mutations.detect{|m| m.identifier == 'jp'}
+    assert jp.new_record?
+  end
+  
 end

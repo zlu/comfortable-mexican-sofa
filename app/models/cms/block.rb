@@ -27,6 +27,21 @@ class Cms::Block < ActiveRecord::Base
     @tag ||= page.tags(true).detect{|t| t.is_cms_block? && t.identifier == identifier}
   end
   
+  # Writer for block mutations. Accepts a hash where key is identifier and value
+  # decides if it needs to be added or removed.
+  def mutation_identifiers=(values)
+    return unless values.is_a?(Hash)
+    values.each do |identifier, checked|
+      checked = checked.to_i == 1
+      existing = self.mutations.detect{|v| v.identifier == identifier}
+      if checked && !existing
+        self.mutations.build(:identifier => identifier)
+      elsif !checked && existing
+        existing.mark_for_destruction
+      end
+    end
+  end
+  
 protected
   
   def prepare_files
