@@ -212,4 +212,48 @@ class CmsBlockTest < ActiveSupport::TestCase
     assert jp.new_record?
   end
   
+  def test_creation_with_mutators
+    assert_difference 'Cms::Block.count' do
+      assert_difference 'Cms::Mutation.count', 2 do
+        block = cms_pages(:default).blocks.create!(
+          :identifier => 'test',
+          :content    => 'test',
+          :mutation_identifiers => {
+            'en' => '1',
+            'fr' => '1',
+            'zz' => '0'
+          }
+        )
+        assert block.mutations.where(:identifier => 'en').exists?
+        assert block.mutations.where(:identifier => 'fr').exists?
+        refute block.mutations.where(:identifier => 'zz').exists?
+      end
+    end
+  end
+  
+  def test_update_with_mutators
+    block = cms_blocks(:default_field_text)
+    assert_equal 2, block.mutations.count
+    
+    assert_no_difference 'Cms::Mutation.count' do
+      block.mutation_identifiers = {
+        'en' => '1',
+        'fr' => '0',
+        'zz' => '1'
+      }
+      block.save!
+      assert block.mutations.where(:identifier => 'en').exists?
+      refute block.mutations.where(:identifier => 'fr').exists?
+      assert block.mutations.where(:identifier => 'zz').exists?
+    end
+  end
+  
+  def test_destroy
+    assert_difference 'Cms::Block.count', -1 do
+      assert_difference 'Cms::Mutation.count', -2 do
+        cms_blocks(:default_field_text).destroy
+      end
+    end
+  end
+  
 end

@@ -8,10 +8,11 @@ class Cms::Block < ActiveRecord::Base
   belongs_to :page
   has_many :mutations,
     :as         => :mutated,
-    :dependent  => :destroy
-  has_many :files,
+    :dependent  => :destroy,
     :autosave   => true,
-    :dependent  => :destroy
+    :inverse_of => :mutated
+  has_many :files,
+    :autosave   => true
   
   # -- Callbacks ------------------------------------------------------------
   before_save :prepare_files
