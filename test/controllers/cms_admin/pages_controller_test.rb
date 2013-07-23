@@ -196,6 +196,25 @@ class CmsAdmin::PagesControllerTest < ActionController::TestCase
     assert_template :new
   end
 
+  def test_get_new_with_array_of_mutators
+    ComfortableMexicanSofa.config.mutators = ['en', 'fr', 'es']
+    get :new, :site_id => cms_sites(:default)
+    assert_response :success
+    assert_select "input[type='checkbox'][name='page[blocks_attributes][0][mutator_identifiers][en]']"
+    assert_select "input[type='checkbox'][name='page[blocks_attributes][0][mutator_identifiers][fr]']"
+    assert_select "input[type='checkbox'][name='page[blocks_attributes][0][mutator_identifiers][es]']"
+  end
+
+  def test_get_new_with_hash_of_mutators
+    ComfortableMexicanSofa.config.mutators = {'en' => ['east', 'west'], 'fr' => ['east', 'west']}
+    get :new, :site_id => cms_sites(:default)
+    assert_response :success
+    assert_select "input[type='checkbox'][name='page[blocks_attributes][0][mutator_identifiers][en.east]']"
+    assert_select "input[type='checkbox'][name='page[blocks_attributes][0][mutator_identifiers][en.west]']"
+    assert_select "input[type='checkbox'][name='page[blocks_attributes][0][mutator_identifiers][fr.east]']"
+    assert_select "input[type='checkbox'][name='page[blocks_attributes][0][mutator_identifiers][fr.west]']"
+  end
+
   def test_get_edit
     page = cms_pages(:default)
     get :edit, :site_id => page.site, :id => page

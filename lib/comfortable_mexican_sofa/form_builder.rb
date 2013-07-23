@@ -6,7 +6,11 @@ class ComfortableMexicanSofa::FormBuilder < FormattedForm::FormBuilder
     label     = tag.page.class.human_attribute_name(tag.identifier.to_s)
     css_class = tag.class.to_s.demodulize.underscore
     content   = ''
-    
+
+    if ComfortableMexicanSofa.config.mutators.present?
+      content << mutator_choices(tag, index)
+    end
+
     case method
     when :file_field_tag
       input_params = {:id => nil}
@@ -25,6 +29,25 @@ class ComfortableMexicanSofa::FormBuilder < FormattedForm::FormBuilder
     content << @template.hidden_field_tag("page[blocks_attributes][#{index}][identifier]", tag.identifier, :id => nil)
     
     element(label, content.html_safe)
+  end
+
+  def mutator_choices(tag, index, namespace = nil, mutators = ComfortableMexicanSofa.config.mutators)
+    content = ''
+    case mutators
+    when Array
+      content << @template.render(
+        'cms_admin/pages/mutator_choices', 
+        :tag       => tag,
+        :index     => index,
+        :namespace => namespace,
+        :mutators   => mutators
+      )
+    when Hash
+      mutators.each do |namespace, mutators|
+        content << mutator_choices(tag, index, namespace, mutators)
+      end
+    end
+    content
   end
   
   def field_date_time(tag, index)

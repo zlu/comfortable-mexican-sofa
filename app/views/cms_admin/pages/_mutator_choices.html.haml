@@ -1,0 +1,16 @@
+.mutation-group
+  - if namespace
+    %label
+      %strong= namespace.upcase
+
+  - mutators.each do |mutator|
+
+    - identifier = namespace ? [namespace, mutator].join('.') : mutator 
+    - name = "page[blocks_attributes][#{index}][mutator_identifiers][#{identifier}]"
+    - checked = tag.block.mutations.detect {|m| m.identifier == identifier}
+
+    = hidden_field_tag name, '0', :id => nil
+    %label
+      = check_box_tag name, '1', checked, :id => nil
+      = mutator.titleize
+
