@@ -85,6 +85,14 @@ ComfortableMexicanSofa.configure do |config|
   # Default is nil (not used)
   #   config.hostname_aliases = nil
 
+  # Mutations, used for building multilingual, regionalized, or any other type of
+  # variable content. This allows your pages to have blocks for specific mutations
+  # (eg. English / French). 
+  # e.g. config.mutators = ['en', 'fr']
+  # e.g. config.mutators = {'en' => ['atlantic', 'central', 'pacific'], 'fr' => ['atlantic', 'central', 'pacific']}
+  # Default is nil (not used)
+  #   config.mutators = ['en', 'fr']
+
 end
 
 # Default credentials for ComfortableMexicanSofa::HttpAuth
