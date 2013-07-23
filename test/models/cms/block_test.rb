@@ -198,16 +198,15 @@ class CmsBlockTest < ActiveSupport::TestCase
   
   def test_mutation_identifiers_writer
     block = cms_blocks(:default_field_text)
-    assert_equal 2, block.mutations.count
+    assert_equal 1, block.mutations.count
     block.mutation_identifiers = {
-      'fr'  => 0,
+      'en'  => 0,
       'jp'  => 1
     }
-    assert_equal 3, block.mutations.size
+    assert_equal 2, block.mutations.size
     assert en = block.mutations.detect{|m| m.identifier == 'en'}
     assert !en.new_record?
-    assert fr = block.mutations.detect{|m| m.identifier == 'fr'}
-    assert fr.marked_for_destruction?
+    assert en.marked_for_destruction?
     assert jp = block.mutations.detect{|m| m.identifier == 'jp'}
     assert jp.new_record?
   end
@@ -233,26 +232,22 @@ class CmsBlockTest < ActiveSupport::TestCase
   
   def test_update_with_mutators
     block = cms_blocks(:default_field_text)
-    assert_equal 2, block.mutations.count
+    assert_equal 1, block.mutations.count
     
     assert_no_difference 'Cms::Mutation.count' do
       block.mutation_identifiers = {
-        'en' => '1',
-        'fr' => '0',
+        'en' => '0',
         'zz' => '1'
       }
       block.save!
-      assert block.mutations.where(:identifier => 'en').exists?
-      refute block.mutations.where(:identifier => 'fr').exists?
+      refute block.mutations.where(:identifier => 'en').exists?
       assert block.mutations.where(:identifier => 'zz').exists?
     end
   end
   
   def test_destroy
-    assert_difference 'Cms::Block.count', -1 do
-      assert_difference 'Cms::Mutation.count', -2 do
-        cms_blocks(:default_field_text).destroy
-      end
+    assert_difference ['Cms::Block.count', 'Cms::Mutation.count'], -1 do
+      cms_blocks(:default_field_text).destroy
     end
   end
   
