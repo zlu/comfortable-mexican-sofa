@@ -11,6 +11,11 @@
 
     = hidden_field_tag name, '0', :id => nil
     %label
-      = check_box_tag name, '1', checked, :id => nil
+      = check_box_tag name, '1', checked, :id => nil, :data => {:identifier => identifier}
       = mutator.titleize
 
+  .actions.pull-right
+    .btn-group
+      = link_to 'None', '#', :class => 'btn btn-small select-none-variation'
+      = link_to 'All', '#', :class => 'btn btn-small select-all-variation'
+      = link_to 'Add Variation', '#', :class => 'btn btn-small add-variation'

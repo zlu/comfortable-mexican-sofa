@@ -13,7 +13,7 @@ $ ->
 window.CMS =
   current_path:           window.location.pathname
   code_mirror_instances:  []
-  
+
   init: ->
     CMS.slugify()
     CMS.wysiwyg()
@@ -26,6 +26,7 @@ window.CMS =
     CMS.page_update_publish()
     CMS.categories()
     CMS.uploader()
+    CMS.mutations()
 
 
 window.CMS.slugify = ->
@@ -51,6 +52,64 @@ window.CMS.wysiwyg = ->
       color:        false
       stylesheets:  []
 
+window.CMS.mutations = ->
+
+  $(document).on 'click', '.select-none-variation', (e) ->
+    $(e.currentTarget).closest('.mutation-group').find('input[type="checkbox"]').prop('checked', false)
+    e.preventDefault()
+
+  $(document).on 'click', '.select-all-variation', (e) ->
+    $(e.currentTarget).closest('.control-group').find('input[type="checkbox"]').prop('checked', false)
+    $(e.currentTarget).closest('.mutation-group').find('input[type="checkbox"]').prop('checked', true)
+    e.preventDefault()
+
+  $(document).on 'change', '.mutation-group input[type="checkbox"]', (e) ->
+    @identifier = $(e.currentTarget).data('identifier')
+    parent = $(e.currentTarget).closest('.control-group')
+    $.each(parent.find('input[type="checkbox"]'), (index, item)=>
+      if $(item).data('identifier') == @identifier
+        $(item).prop('checked', false)
+    )
+    $(e.currentTarget).prop('checked', true)
+    return true
+
+  $(document).on 'click', '.add-variation', (e) ->
+    e.preventDefault()
+
+
+    # Clear any instances of Code Mirror
+    for cm in CMS.code_mirror_instances
+      cm.toTextArea()
+    CMS.code_mirror_instances = []
+
+    # Create a new MutationComponent
+    mutation_component = new CMS.MutationComponent(e.currentTarget)
+    mutation_component.uncheck_all()
+
+    # Reinitialize Code Mirror
+    CMS.codemirror()
+
+window.CMS.MutationComponent = (target)->
+
+  # Fetch the relevent nodes
+  @control_group = $(target).closest('.control-group')
+  @controls      = $(target).closest('.controls')
+
+  # Clone the controls and create a unique index
+  @clone         = @controls.clone()
+  timestamp      = new Date().getTime()
+  regex = /((?:category|page|snippet)\[\w*\]\[)\d*(\])/g
+  @clone.html(@clone.html().replace(regex, "$1#{timestamp}$2")).hide()
+
+  # Add the clone into the DOM and display it
+  @controls.after(@clone)
+  @clone.slideDown()
+
+  # Return a helpful object
+  check_all: =>
+    @clone.find('input[type="checkbox"]').prop('checked', true)
+  uncheck_all: =>
+    @clone.find('input[type="checkbox"]').prop('checked', false)
 
 window.CMS.codemirror = ->
   $('textarea[data-cm-mode]').each (i, element) ->

@@ -33,6 +33,7 @@ class ComfortableMexicanSofa::FormBuilder < FormattedForm::FormBuilder
 
   def mutator_choices(tag, index, namespace = nil, mutators = ComfortableMexicanSofa.config.mutators)
     content = ''
+    # content << (link_to 'Add Variation', '#', :class => 'btn').to_s
     case mutators
     when Array
       content << @template.render(
