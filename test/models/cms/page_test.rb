@@ -244,6 +244,13 @@ class CmsPageTest < ActiveSupport::TestCase
     assert_equal '/child-page/tést-ünicode-slug', found_page.full_path
   end
   
+  def test_mutator_identifier
+    page = cms_pages(:default)
+    assert_equal nil, page.mutator_identifier
+    page.mutator_identifier = 'en'
+    assert_equal 'en', page.mutator_identifier
+  end
+  
 protected
   
   def new_params(options = {})

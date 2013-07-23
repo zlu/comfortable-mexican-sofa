@@ -21,13 +21,6 @@ class Cms::Block < ActiveRecord::Base
   validates :identifier,
     :presence   => true,
     :uniqueness => { :scope => :page_id }
-    
-  # -- Scopes ---------------------------------------------------------------
-  scope :for_mutator, lambda {|*identifier|
-    ComfortableMexicanSofa.config.mutators.present??
-      joins(:mutations).where(:cms_mutations => {:identifier => identifier.first}) :
-      all
-  }
   
   # -- Instance Methods -----------------------------------------------------
   # Tag object that is using this block
@@ -37,7 +30,7 @@ class Cms::Block < ActiveRecord::Base
   
   # Writer for block mutations. Accepts a hash where key is identifier and value
   # decides if it needs to be added or removed.
-  def mutation_identifiers=(values)
+  def mutator_identifiers=(values)
     return unless values.is_a?(Hash)
     values.each do |identifier, checked|
       checked = checked.to_i == 1

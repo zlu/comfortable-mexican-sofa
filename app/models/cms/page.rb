@@ -12,6 +12,7 @@ class Cms::Page < ActiveRecord::Base
   cms_has_revisions_for :blocks_attributes
   
   attr_accessor :tags,
+                :mutator_identifier,
                 :blocks_attributes_changed
   
   # -- Relationships --------------------------------------------------------
@@ -84,7 +85,7 @@ class Cms::Page < ActiveRecord::Base
   # Array of block hashes in the following format:
   #   [
   #     { :identifier => 'block_1', :content => 'block content' },
-  #     { :identifier => 'block_2', :content => 'block content' }
+  #     { :identifier => 'block_2', :content => 'block content', :mutator_identifiers => {'en' => '1'} }
   #   ]
   def blocks_attributes=(block_hashes = [])
     block_hashes = block_hashes.values if block_hashes.is_a?(Hash)
@@ -93,7 +94,8 @@ class Cms::Page < ActiveRecord::Base
       block = 
         self.blocks.detect{|b| b.identifier == block_hash[:identifier]} || 
         self.blocks.build(:identifier => block_hash[:identifier])
-      block.content = block_hash[:content]
+      block.content             = block_hash[:content]
+      block.mutator_identifiers = block_hash[:mutator_identifiers]
       self.blocks_attributes_changed = self.blocks_attributes_changed || block.content_changed?
     end
   end

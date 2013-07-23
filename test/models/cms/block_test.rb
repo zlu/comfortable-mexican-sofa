@@ -199,7 +199,7 @@ class CmsBlockTest < ActiveSupport::TestCase
   def test_mutation_identifiers_writer
     block = cms_blocks(:default_field_text)
     assert_equal 1, block.mutations.count
-    block.mutation_identifiers = {
+    block.mutator_identifiers = {
       'en'  => 0,
       'jp'  => 1
     }
@@ -217,7 +217,7 @@ class CmsBlockTest < ActiveSupport::TestCase
         block = cms_pages(:default).blocks.create!(
           :identifier => 'test',
           :content    => 'test',
-          :mutation_identifiers => {
+          :mutator_identifiers => {
             'en' => '1',
             'fr' => '1',
             'zz' => '0'
@@ -235,7 +235,7 @@ class CmsBlockTest < ActiveSupport::TestCase
     assert_equal 1, block.mutations.count
     
     assert_no_difference 'Cms::Mutation.count' do
-      block.mutation_identifiers = {
+      block.mutator_identifiers = {
         'en' => '0',
         'zz' => '1'
       }
@@ -249,18 +249,6 @@ class CmsBlockTest < ActiveSupport::TestCase
     assert_difference ['Cms::Block.count', 'Cms::Mutation.count'], -1 do
       cms_blocks(:default_field_text).destroy
     end
-  end
-  
-  def test_scope_for_mutator
-    assert ComfortableMexicanSofa.config.mutators.nil?
-    assert_equal 2, Cms::Block.for_mutator.count
-    assert_equal 2, Cms::Block.for_mutator('en').count
-    assert_equal 2, Cms::Block.for_mutator('invalid').count
-    
-    ComfortableMexicanSofa.config.mutators = [:en, :fr]
-    assert_equal 0, Cms::Block.for_mutator.count
-    assert_equal 1, Cms::Block.for_mutator('en').count
-    assert_equal 0, Cms::Block.for_mutator('invalid').count
   end
   
 end

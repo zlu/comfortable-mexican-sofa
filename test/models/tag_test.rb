@@ -305,4 +305,26 @@ class TagTest < ActiveSupport::TestCase
     assert_equal 'ho-me.ma-in', tag.namespace
   end
   
+  def test_block_with_mutations
+    page = cms_pages(:default)
+    
+    tag = ComfortableMexicanSofa::Tag::FieldText.new
+    tag.page        = page
+    tag.identifier  = 'default_field_text'
+    assert_equal cms_blocks(:default_field_text), tag.block
+    
+    ComfortableMexicanSofa.config.mutators = [:en, :fr]
+    page.mutator_identifier = 'en'
+    tag = ComfortableMexicanSofa::Tag::FieldText.new
+    tag.page        = page
+    tag.identifier  = 'default_field_text'
+    assert_equal cms_blocks(:default_field_text), tag.block
+    
+    page.mutator_identifier = 'fr'
+    tag = ComfortableMexicanSofa::Tag::FieldText.new
+    tag.page        = page
+    tag.identifier  = 'default_field_text'
+    assert tag.block.new_record?
+  end
+  
 end
