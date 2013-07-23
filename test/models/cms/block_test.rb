@@ -251,4 +251,16 @@ class CmsBlockTest < ActiveSupport::TestCase
     end
   end
   
+  def test_scope_for_mutator
+    assert ComfortableMexicanSofa.config.mutators.nil?
+    assert_equal 2, Cms::Block.for_mutator.count
+    assert_equal 2, Cms::Block.for_mutator('en').count
+    assert_equal 2, Cms::Block.for_mutator('invalid').count
+    
+    ComfortableMexicanSofa.config.mutators = [:en, :fr]
+    assert_equal 0, Cms::Block.for_mutator.count
+    assert_equal 1, Cms::Block.for_mutator('en').count
+    assert_equal 0, Cms::Block.for_mutator('invalid').count
+  end
+  
 end

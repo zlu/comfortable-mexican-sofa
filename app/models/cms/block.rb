@@ -22,6 +22,13 @@ class Cms::Block < ActiveRecord::Base
     :presence   => true,
     :uniqueness => { :scope => :page_id }
     
+  # -- Scopes ---------------------------------------------------------------
+  scope :for_mutator, lambda {|*identifier|
+    ComfortableMexicanSofa.config.mutators.present??
+      joins(:mutations).where(:cms_mutations => {:identifier => identifier.first}) :
+      all
+  }
+  
   # -- Instance Methods -----------------------------------------------------
   # Tag object that is using this block
   def tag

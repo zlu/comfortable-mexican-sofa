@@ -63,6 +63,14 @@ class ComfortableMexicanSofa::Configuration
   # Default is nil (not used)
   attr_accessor :hostname_aliases
   
+  # Block-level content mutators. It's possible to define what content block get's rendered
+  # based on locale or any other arbitrary condition. For example:
+  #   config.mutators = [:en, :fr, :es, :jp]
+  #   config.mutators = {:en => [:on, :bc], :fr => [:on, :bc]}
+  #   config.mutators = {:en => {:on => [:toronto, :hamilton]}, :fr => {:on => [:toronto, :hamilton]}}
+  # Default is nil (not used)
+  attr_accessor :mutators
+  
   # Configuration defaults
   def initialize
     @cms_title            = 'ComfortableMexicanSofa CMS Engine'
@@ -94,6 +102,7 @@ class ComfortableMexicanSofa::Configuration
     @allowed_helpers      = nil
     @allowed_partials     = nil
     @hostname_aliases     = nil
+    @mutators             = nil
   end
 
 end
