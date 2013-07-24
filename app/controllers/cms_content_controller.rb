@@ -62,7 +62,9 @@ protected
     @cms_page = @cms_site.pages.published.find_by_full_path!("/#{params[:cms_path]}")
     return redirect_to(@cms_page.target_page.url) if @cms_page.target_page
     
-    @cms_page.mutator_identifier = @cms_mutator_identifier
+    # Setting mutator identifier to serve proper content
+    # cms_mutator_identifier should exist in your ApplicationController
+    @cms_page.mutator_identifier = cms_mutator_identifier rescue nil
     
   rescue ActiveRecord::RecordNotFound
     if @cms_page = @cms_site.pages.published.find_by_full_path('/404')

@@ -184,5 +184,40 @@ class CmsContentControllerTest < ActionController::TestCase
     assert_equal cms_sites(:default), assigns(:cms_site)
     assert_match '<loc>http://test.host/en/child-page</loc>', response.body
   end
+  
+  def test_render_html_with_mutation
+    ComfortableMexicanSofa.config.mutators = [:en, :fr]
+    CmsContentController.any_instance.stubs(:cms_mutator_identifier).returns('en')
+    
+    get :render_html, :cms_path => ''
+    assert assigns(:cms_page)
+    assert_equal 'en', assigns(:cms_page).mutator_identifier
+    assert_equal rendered_content_formatter(
+      '
+      layout_content_a
+      default_page_text_content_a
+      default_snippet_content
+      default_page_text_content_b
+      layout_content_b
+      default_snippet_content
+      layout_content_c'
+    ), response.body
+  end
+  
+  def test_render_html_with_mutation_invalid
+    ComfortableMexicanSofa.config.mutators = [:en, :fr]
+    CmsContentController.any_instance.stubs(:cms_mutator_identifier).returns('zz')
+    
+    get :render_html, :cms_path => ''
+    assert_equal 'zz', assigns(:cms_page).mutator_identifier
+    assert_equal rendered_content_formatter(
+      '
+      layout_content_a
+      
+      layout_content_b
+      default_snippet_content
+      layout_content_c'
+    ), response.body
+  end
 
 end

@@ -1,3 +1,3 @@
 default:
-  mutated: default_field_text (Cms::Block)
+  mutated: default_page_text (Cms::Block)
   identifier: en

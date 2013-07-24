@@ -87,18 +87,14 @@ module ComfortableMexicanSofa::Tag
     
     # Find or initialize Cms::Block object
     def block
-      block = if ComfortableMexicanSofa.config.mutators.present? && page.mutator_identifier.present?
-        page.blocks.detect{|b|
+      if ComfortableMexicanSofa.config.mutators.present? && page.mutator_identifier.present?
+        page.blocks.detect do |b|
           b.identifier == self.identifier.to_s && 
-          b.mutations.detect{|m|
-            m.identifier == page.mutator_identifier.to_s
-          }
-        }
+          b.mutations.detect{|m| m.identifier == page.mutator_identifier.to_s}
+        end
       else
         page.blocks.detect{|b| b.identifier == self.identifier.to_s}
-      end
-      
-      block || page.blocks.build(:identifier => self.identifier.to_s)
+      end || page.blocks.build(:identifier => self.identifier.to_s)
     end
     
     # Checks if this tag is using Cms::Block

@@ -239,7 +239,7 @@ class TagTest < ActiveSupport::TestCase
         { :identifier => 'content',
           :content    => 'text {{ cms:snippet:no-irb-snippet }} {{ cms:partial:path/to }} {{ cms:helper:method }} text' },
         { :identifier => 'snippet',
-          :content    => snippet.id }
+          :content    => snippet.id.to_s }
       ]
     )
     assert_equal "&lt;% 1 + 1 %&gt; text &lt;% 2 + 2 %&gt; snippet &lt;%= 2 + 2 %&gt; <%= render :partial => 'path/to' %> <%= method() %> text <%= render :partial => 'partials/cms/snippets', :locals => {:model => 'Cms::Snippet', :identifier => '#{snippet.id}'} %> &lt;%= 1 + 1 %&gt;", page.content
@@ -265,7 +265,7 @@ class TagTest < ActiveSupport::TestCase
         { :identifier => 'content',
           :content    => 'text {{ cms:snippet:irb-snippet }} {{ cms:partial:path/to }} {{ cms:helper:method }} text' },
         { :identifier => 'snippet',
-          :content    => snippet.id }
+          :content    => snippet.id.to_s }
       ]
     )
     assert_equal "<% 1 + 1 %> text <% 2 + 2 %> snippet <%= 2 + 2 %> <%= render :partial => 'path/to' %> <%= method() %> text <%= render :partial => 'partials/cms/snippets', :locals => {:model => 'Cms::Snippet', :identifier => '#{snippet.id}'} %> <%= 1 + 1 %>", page.content
@@ -310,20 +310,20 @@ class TagTest < ActiveSupport::TestCase
     
     tag = ComfortableMexicanSofa::Tag::FieldText.new
     tag.page        = page
-    tag.identifier  = 'default_field_text'
-    assert_equal cms_blocks(:default_field_text), tag.block
+    tag.identifier  = 'default_page_text'
+    assert_equal cms_blocks(:default_page_text), tag.block
     
     ComfortableMexicanSofa.config.mutators = [:en, :fr]
     page.mutator_identifier = 'en'
     tag = ComfortableMexicanSofa::Tag::FieldText.new
     tag.page        = page
-    tag.identifier  = 'default_field_text'
-    assert_equal cms_blocks(:default_field_text), tag.block
+    tag.identifier  = 'default_page_text'
+    assert_equal cms_blocks(:default_page_text), tag.block
     
     page.mutator_identifier = 'fr'
     tag = ComfortableMexicanSofa::Tag::FieldText.new
     tag.page        = page
-    tag.identifier  = 'default_field_text'
+    tag.identifier  = 'default_page_text'
     assert tag.block.new_record?
   end
   

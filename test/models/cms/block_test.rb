@@ -197,7 +197,7 @@ class CmsBlockTest < ActiveSupport::TestCase
   end
   
   def test_mutation_identifiers_writer
-    block = cms_blocks(:default_field_text)
+    block = cms_blocks(:default_page_text)
     assert_equal 1, block.mutations.count
     block.mutator_identifiers = {
       'en'  => 0,
@@ -231,7 +231,7 @@ class CmsBlockTest < ActiveSupport::TestCase
   end
   
   def test_update_with_mutators
-    block = cms_blocks(:default_field_text)
+    block = cms_blocks(:default_page_text)
     assert_equal 1, block.mutations.count
     
     assert_no_difference 'Cms::Mutation.count' do
@@ -247,7 +247,7 @@ class CmsBlockTest < ActiveSupport::TestCase
   
   def test_destroy
     assert_difference ['Cms::Block.count', 'Cms::Mutation.count'], -1 do
-      cms_blocks(:default_field_text).destroy
+      cms_blocks(:default_page_text).destroy
     end
   end
   
