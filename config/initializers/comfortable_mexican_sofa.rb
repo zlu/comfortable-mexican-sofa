@@ -88,10 +88,10 @@ ComfortableMexicanSofa.configure do |config|
   # Mutations, used for building multilingual, regionalized, or any other type of
   # variable content. This allows your pages to have blocks for specific mutations
   # (eg. English / French). 
-  # e.g. config.mutators = ['en', 'fr']
-  # e.g. config.mutators = {'en' => ['atlantic', 'central', 'pacific'], 'fr' => ['atlantic', 'central', 'pacific']}
-  # Default is nil (not used)
   #   config.mutators = ['en', 'fr']
+  #   config.mutators = {'en' => ['atlantic', 'pacific'], 'fr' => ['atlantic', 'pacific']}
+  # Default is nil (not used)
+  #   config.mutators = nil
 
 end
 
