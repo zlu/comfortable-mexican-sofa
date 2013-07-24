@@ -91,11 +91,12 @@ class Cms::Page < ActiveRecord::Base
   #   ]
   def blocks_attributes=(block_hashes = [])
     block_hashes = block_hashes.values if block_hashes.is_a?(Hash)
+    version = self.versions.build
+    
     block_hashes.each do |block_hash|
       block_hash.symbolize_keys! unless block_hash.is_a?(HashWithIndifferentAccess)
-      block = 
-        self.blocks.detect{|b| b.identifier == block_hash[:identifier]} || 
-        self.blocks.build(:identifier => block_hash[:identifier])
+      
+      block = version.blocks.build(:identifier => block_hash[:identifier])
       block.content             = block_hash[:content]
       block.mutator_identifiers = block_hash[:mutator_identifiers]
       self.blocks_attributes_changed = self.blocks_attributes_changed || block.content_changed?

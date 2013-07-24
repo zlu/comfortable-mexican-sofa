@@ -14,8 +14,6 @@ class Cms::Block < ActiveRecord::Base
     :inverse_of => :mutated
   has_many :files,
     :autosave   => true
-    
-  delegate :page, :to => :version
   
   # -- Callbacks ------------------------------------------------------------
   before_save :prepare_files
@@ -25,6 +23,10 @@ class Cms::Block < ActiveRecord::Base
     :presence   => true
   
   # -- Instance Methods -----------------------------------------------------
+  def page
+    version.versioned
+  end
+  
   # Tag object that is using this block
   def tag
     @tag ||= page.tags(true).detect{|t| t.is_cms_block? && t.identifier == identifier}
