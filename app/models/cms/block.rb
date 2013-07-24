@@ -19,8 +19,7 @@ class Cms::Block < ActiveRecord::Base
   
   # -- Validations ----------------------------------------------------------
   validates :identifier,
-    :presence   => true,
-    :uniqueness => { :scope => :page_id }
+    :presence   => true
   
   # -- Instance Methods -----------------------------------------------------
   # Tag object that is using this block

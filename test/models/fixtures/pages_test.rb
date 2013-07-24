@@ -115,6 +115,7 @@ class FixturePagesTest < ActiveSupport::TestCase
     cms_categories(:default).categorizations.create!(
       :categorized => cms_pages(:default)
     )
+    Cms::Mutation.destroy_all
     
     host_path = File.join(ComfortableMexicanSofa.config.fixtures_path, 'test-site')
     page_1_attr_path    = File.join(host_path, 'pages/index/attributes.yml')
@@ -146,6 +147,24 @@ class FixturePagesTest < ActiveSupport::TestCase
       'position'      => 0
     }), YAML.load_file(page_2_attr_path)
     
+    FileUtils.rm_rf(host_path)
+  end
+  
+  def test_import_mutated_blocks
+    Cms::Page.delete_all
+    ComfortableMexicanSofa::Fixture::Page::Importer.new('sample-site', 'default-site').import!
+    assert page = Cms::Page.where(:full_path => '/').first
+    
+    flunk "Can't edit blocks. needs to always create new set"
+    assert_equal 2, page.blocks.where(:identifier => 'ns.mutated').count
+  end
+  
+  def test_export_mutated_blocks
+    host_path = File.join(ComfortableMexicanSofa.config.fixtures_path, 'test-site')
+    page_block_path = File.join(host_path, 'pages/index/default_page_text[en].html')
+    
+    ComfortableMexicanSofa::Fixture::Page::Exporter.new('default-site', 'test-site').export!
+    assert_equal cms_blocks(:default_page_text).content, IO.read(page_block_path)
     FileUtils.rm_rf(host_path)
   end
   

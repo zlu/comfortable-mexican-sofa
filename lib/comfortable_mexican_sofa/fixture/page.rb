@@ -38,11 +38,20 @@ module ComfortableMexicanSofa::Fixture::Page
         blocks_attributes = [ ]
         Dir.glob("#{path}/*.html").each do |block_path|
           identifier = block_path.split('/').last.gsub(/\.html$/, '')
+          
+          m = identifier.match(/(.+?)(?:\[(.*?)\])?\Z/)
+          identifier, mutators = m[1], m[2]
+          
+          mutator_hash = mutators.present??
+            mutators.split(',').each_with_object({}){|m, h| h[m.strip] = '1'} : 
+            {}
+          
           blocks_to_clear.delete(identifier)
           if fresh_fixture?(page, block_path)
             blocks_attributes << {
-              :identifier => identifier,
-              :content    => File.open(block_path).read
+              :identifier           => identifier,
+              :content              => File.open(block_path).read,
+              :mutator_identifiers  => mutator_hash
             }
           end
         end
@@ -109,9 +118,13 @@ module ComfortableMexicanSofa::Fixture::Page
             'position'      => page.position
           }.to_yaml)
         end
-        page.blocks_attributes.each do |block|
-          open(File.join(page_path, "#{block[:identifier]}.html"), 'w') do |f|
-            f.write(block[:content])
+        page.blocks.each do |block|
+          mutators = block.mutations.collect{|m| m.identifier}.join(',')
+          block_filename = mutators.present??
+            "#{block.identifier}[#{mutators}].html" :
+            "#{block.identifier}.html"
+          open(File.join(page_path, block_filename), 'w') do |f|
+            f.write(block.content)
           end
         end
         
