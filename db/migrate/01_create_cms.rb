@@ -59,12 +59,12 @@ class CreateCms < ActiveRecord::Migration
     
     # -- Page Blocks --------------------------------------------------------
     create_table :cms_blocks do |t|
-      t.integer   :page_id,     :null => false
+      t.integer   :version_id,  :null => false
       t.string    :identifier,  :null => false
       t.text      :content,     text_limit
       t.timestamps
     end
-    add_index :cms_blocks, [:page_id, :identifier]
+    add_index :cms_blocks, [:version_id, :identifier]
     
     # -- Snippets -----------------------------------------------------------
     create_table :cms_snippets do |t|
@@ -136,13 +136,10 @@ class CreateCms < ActiveRecord::Migration
       t.string    :versioned_type,  :null => false
       t.integer   :versioned_id,    :null => false
       t.boolean   :is_active,       :null => false, :default => false
-      t.datetime  :published_at
-      t.text      :cache,             text_limit
     end
     add_index :cms_versions, [:versioned_type, :versioned_id],
      :name => 'index_cms_versions_on_versioned'
     add_index :cms_versions, :is_active
-    add_index :cms_versions, :published_at
     
   end
 end

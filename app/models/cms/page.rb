@@ -20,9 +20,11 @@ class Cms::Page < ActiveRecord::Base
   belongs_to :layout
   belongs_to :target_page,
     :class_name => 'Cms::Page'
-  has_many :blocks,
-    :autosave   => true,
+  has_many :versions,
+    :as         => :versioned,
     :dependent  => :destroy
+  has_many :blocks,
+    :through    => :versions
   
   # -- Callbacks ------------------------------------------------------------
   before_validation :assigns_label,

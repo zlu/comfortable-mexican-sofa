@@ -5,7 +5,8 @@ class Cms::Block < ActiveRecord::Base
   self.table_name = 'cms_blocks'
   
   # -- Relationships --------------------------------------------------------
-  belongs_to :page
+  belongs_to :version
+  
   has_many :mutations,
     :as         => :mutated,
     :dependent  => :destroy,
@@ -13,6 +14,8 @@ class Cms::Block < ActiveRecord::Base
     :inverse_of => :mutated
   has_many :files,
     :autosave   => true
+    
+  delegate :page, :to => :version
   
   # -- Callbacks ------------------------------------------------------------
   before_save :prepare_files

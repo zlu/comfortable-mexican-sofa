@@ -1,5 +1,7 @@
 class Cms::Mutation < ActiveRecord::Base
   
+  ComfortableMexicanSofa.establish_connection(self)
+  
   self.table_name = 'cms_mutations'
   
   # -- Relationships --------------------------------------------------------

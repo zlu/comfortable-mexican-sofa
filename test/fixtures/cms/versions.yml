@@ -1,0 +1,3 @@
+default:
+  versioned: default (Cms::Page)
+  is_active: true
