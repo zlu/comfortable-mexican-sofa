@@ -6,14 +6,16 @@ class Cms::Version < ActiveRecord::Base
   
   # -- Relationships --------------------------------------------------------
   belongs_to :versioned,
-    :polymorphic  => true
+    :polymorphic  => true,
+    :inverse_of   => :versions
     
   has_many :blocks,
-    :autosave     => true,
+    # :autosave     => true,
+    :inverse_of   => :version,
     :dependent    => :destroy
     
   # -- Callbacks ------------------------------------------------------------
-  after_create :set_as_active!
+  # after_create :set_as_active!
   
   # -- Scopes ---------------------------------------------------------------
   scope :active, -> {

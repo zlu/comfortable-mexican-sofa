@@ -24,14 +24,18 @@ class CmsBlockTest < ActiveSupport::TestCase
         :blocks_attributes => [
           {
             :identifier => 'default_page_text',
-            :content    => 'test_content'
+            :content    => 'test content'
           }
         ]
       )
+      
+      # raise page.versions.first.blocks.first.tag.inspect
+      page.versions.first.blocks.first.send(:prepare_files)
+      
       assert_equal 1, page.blocks.count
       block = page.blocks.first
       assert_equal 'default_page_text', block.identifier
-      assert_equal 'test_content', block.content
+      assert_equal 'test content', block.content
     end
   end
   

@@ -7,9 +7,9 @@ class Cms::Page < ActiveRecord::Base
   self.table_name = 'cms_pages'
   
   cms_acts_as_tree :counter_cache => :children_count
-  cms_is_categorized
-  cms_is_mirrored
-  cms_has_revisions_for :blocks_attributes
+  # cms_is_categorized
+  # cms_is_mirrored
+  # cms_has_revisions_for :blocks_attributes
   
   attr_accessor :tags,
                 :mutator_identifier,
@@ -22,7 +22,9 @@ class Cms::Page < ActiveRecord::Base
     :class_name => 'Cms::Page'
   has_many :versions,
     :as         => :versioned,
-    :dependent  => :destroy
+    :inverse_of => :versioned,
+    :dependent  => :destroy#,
+    #:autosave   => true
   has_many :blocks,
     :through    => :versions
   
@@ -32,8 +34,8 @@ class Cms::Page < ActiveRecord::Base
                     :escape_slug,
                     :assign_full_path
   before_create     :assign_position
-  before_save       :set_cached_content
-  after_save        :sync_child_pages
+  # before_save       :set_cached_content
+  # after_save        :sync_child_pages
   after_find        :unescape_slug_and_path
   
   # -- Validations ----------------------------------------------------------
@@ -91,7 +93,7 @@ class Cms::Page < ActiveRecord::Base
   #   ]
   def blocks_attributes=(block_hashes = [])
     block_hashes = block_hashes.values if block_hashes.is_a?(Hash)
-    version = self.versions.build
+    version = versions.build
     
     block_hashes.each do |block_hash|
       block_hash.symbolize_keys! unless block_hash.is_a?(HashWithIndifferentAccess)
@@ -99,7 +101,7 @@ class Cms::Page < ActiveRecord::Base
       block = version.blocks.build(:identifier => block_hash[:identifier])
       block.content             = block_hash[:content]
       block.mutator_identifiers = block_hash[:mutator_identifiers]
-      self.blocks_attributes_changed = self.blocks_attributes_changed || block.content_changed?
+      # self.blocks_attributes_changed = self.blocks_attributes_changed || block.content_changed?
     end
   end
   

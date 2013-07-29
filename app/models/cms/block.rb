@@ -5,7 +5,8 @@ class Cms::Block < ActiveRecord::Base
   self.table_name = 'cms_blocks'
   
   # -- Relationships --------------------------------------------------------
-  belongs_to :version
+  belongs_to :version,
+    :inverse_of => :blocks
   
   has_many :mutations,
     :as         => :mutated,
@@ -16,7 +17,7 @@ class Cms::Block < ActiveRecord::Base
     :autosave   => true
   
   # -- Callbacks ------------------------------------------------------------
-  before_save :prepare_files
+  # before_save :prepare_files
   
   # -- Validations ----------------------------------------------------------
   validates :identifier,
