@@ -159,8 +159,10 @@ protected
 
   def trigger_page_content_callbacks
     self.page_contents.each do |pc|
-      pc.assign_full_path
-      pc.save
+      if pc.slug_changed?
+        pc.assign_full_path
+        pc.save
+      end
     end
   end
 
