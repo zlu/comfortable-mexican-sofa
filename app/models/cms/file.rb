@@ -1,10 +1,6 @@
-class Cms::File < ActiveRecord::Base
+class Cms::File < Cms::Base
   
   IMAGE_MIMETYPES = %w(gif jpeg pjpeg png svg+xml tiff).collect{|subtype| "image/#{subtype}"}
-  
-  ComfortableMexicanSofa.establish_connection(self)
-    
-  self.table_name = 'cms_files'
   
   cms_is_categorized
   
@@ -64,7 +60,7 @@ protected
   def reload_page_cache
     return unless self.block
     p = self.block.page
-    Cms::Page.where(:id => p.id).update_all(:content => p.content(true))
+    Cms::Page.where(:id => p.id).update_all(:content => nil)
   end
   
 end

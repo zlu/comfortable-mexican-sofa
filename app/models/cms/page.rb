@@ -1,10 +1,6 @@
 # encoding: utf-8
 
-class Cms::Page < ActiveRecord::Base
-  
-  ComfortableMexicanSofa.establish_connection(self)
-    
-  self.table_name = 'cms_pages'
+class Cms::Page < Cms::Base
   
   cms_acts_as_tree :counter_cache => :children_count
   cms_is_categorized
@@ -12,6 +8,7 @@ class Cms::Page < ActiveRecord::Base
   cms_has_revisions_for :blocks_attributes
   
   attr_accessor :tags,
+                :cached_content,
                 :blocks_attributes_changed
   
   # -- Relationships --------------------------------------------------------
@@ -30,7 +27,7 @@ class Cms::Page < ActiveRecord::Base
                     :assign_full_path
   before_create     :assign_position
   before_save       :set_cached_content
-  after_save        :sync_child_pages
+  after_save        :sync_child_full_paths!
   after_find        :unescape_slug_and_path
   
   # -- Validations ----------------------------------------------------------
@@ -100,31 +97,38 @@ class Cms::Page < ActiveRecord::Base
   
   # Processing content will return rendered content and will populate 
   # self.cms_tags with instances of CmsTag
-  def content(force_reload = false)
-    @content = force_reload ? nil : read_attribute(:content)
-    @content ||= begin
-      self.tags = [] # resetting
-      if layout
-        ComfortableMexicanSofa::Tag.process_content(
-          self,
-          ComfortableMexicanSofa::Tag.sanitize_irb(layout.merged_content)
-        )
-      else
-        ''
-      end
+  def render
+    @tags = [] # resetting
+    return '' unless layout
+    
+    ComfortableMexicanSofa::Tag.process_content(
+      self, ComfortableMexicanSofa::Tag.sanitize_irb(layout.merged_content)
+    )
+  end
+  
+  # Cached content accessor
+  def content
+    if (@cached_content = read_attribute(:content)).nil?
+      @cached_content = self.render
+      update_column(:content, @cached_content) unless self.new_record?
     end
+    @cached_content
+  end
+  
+  def clear_cached_content!
+    self.update_column(:content, nil)
   end
   
   # Array of cms_tags for a page. Content generation is called if forced.
   # These also include initialized cms_blocks if present
   def tags(force_reload = false)
-    self.content(true) if force_reload
+    self.render if force_reload
     @tags ||= []
   end
   
   # Full url for a page
   def url
-    "http://" + "#{self.site.hostname}/#{self.site.path}/#{self.full_path}".squeeze("/")
+    "//" + "#{self.site.hostname}/#{self.site.path}/#{self.full_path}".squeeze("/")
   end
   
   # Method to collect prevous state of blocks for revisions
@@ -168,14 +172,18 @@ protected
     errors.add(:slug, :invalid) unless unescaped_slug =~ /^\p{Alnum}[\.\p{Alnum}\p{Mark}_-]*$/i
   end
   
-  # NOTE: This can create 'phantom' page blocks as they are defined in the layout. This is normal.
   def set_cached_content
-    write_attribute(:content, self.content(true))
+    @cached_content = self.render
+    write_attribute(:content, self.cached_content)
   end
   
   # Forcing re-saves for child pages so they can update full_paths
-  def sync_child_pages
-    children.each{ |p| p.save! } if full_path_changed?
+  def sync_child_full_paths!
+    return unless full_path_changed?
+    children.each do |p|
+      p.update_column(:full_path, p.send(:assign_full_path))
+      p.send(:sync_child_full_paths!)
+    end
   end
 
   # Escape slug unless it's nonexistent (root)

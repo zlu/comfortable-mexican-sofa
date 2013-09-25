@@ -47,17 +47,13 @@ module ComfortableMexicanSofa::Fixture::Page
           end
         end
         
-        blocks_to_clear.each do |identifier|
-          blocks_attributes << {
-            :identifier => identifier,
-            :content    => nil
-          }
-        end
+        # deleting removed blocks
+        page.blocks.where(:identifier => blocks_to_clear).destroy_all
         
         page.blocks_attributes = blocks_attributes if blocks_attributes.present?
         
         # saving
-        if page.changed? || self.force_import
+        if page.changed? || page.blocks_attributes_changed || self.force_import
           if page.save
             save_categorizations!(page, categories)
             ComfortableMexicanSofa.logger.warn("[FIXTURES] Imported Page \t #{page.full_path}")

@@ -1,8 +1,4 @@
-class Cms::Layout < ActiveRecord::Base
-  
-  ComfortableMexicanSofa.establish_connection(self)
-    
-  self.table_name = 'cms_layouts'
+class Cms::Layout < Cms::Base
   
   cms_acts_as_tree
   cms_is_mirrored
@@ -84,7 +80,7 @@ protected
   
   # Forcing page content reload
   def clear_cached_page_content
-    self.pages.each{ |page| page.save! }
+    self.pages.each{ |page| page.clear_cached_content! }
     self.children.each{ |child_layout| child_layout.clear_cached_page_content }
   end
   

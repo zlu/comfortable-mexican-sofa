@@ -7,7 +7,7 @@ class CmsPageTest < ActiveSupport::TestCase
   def test_fixtures_validity
     Cms::Page.all.each do |page|
       assert page.valid?, page.errors.full_messages.to_s
-      assert_equal page.read_attribute(:content), page.content(true)
+      assert_equal page.content, page.render
     end
   end
   
@@ -195,13 +195,13 @@ class CmsPageTest < ActiveSupport::TestCase
   
   def test_content_caching
     page = cms_pages(:default)
-    assert_equal page.read_attribute(:content), page.content
-    assert_equal page.read_attribute(:content), page.content(true)
+    assert_equal page.content, page.render
     
-    page.update_attributes(:content => 'changed')
-    assert_equal page.read_attribute(:content), page.content
-    assert_equal page.read_attribute(:content), page.content(true)
-    assert_not_equal 'changed', page.read_attribute(:content)
+    page.update_columns(:content => 'Old Content')
+    refute_equal page.content, page.render
+    
+    page.clear_cached_content!
+    assert_equal page.content, page.render
   end
   
   def test_scope_published
@@ -218,15 +218,15 @@ class CmsPageTest < ActiveSupport::TestCase
   def test_url
     site = cms_sites(:default)
     
-    assert_equal 'http://test.host/', cms_pages(:default).url
-    assert_equal 'http://test.host/child-page', cms_pages(:child).url
+    assert_equal '//test.host/', cms_pages(:default).url
+    assert_equal '//test.host/child-page', cms_pages(:child).url
     
     site.update_columns(:path => '/en/site')
     cms_pages(:default).reload
     cms_pages(:child).reload
     
-    assert_equal 'http://test.host/en/site/', cms_pages(:default).url
-    assert_equal 'http://test.host/en/site/child-page', cms_pages(:child).url
+    assert_equal '//test.host/en/site/', cms_pages(:default).url
+    assert_equal '//test.host/en/site/child-page', cms_pages(:child).url
   end
 
   def test_unicode_slug_escaping
